@@ -1,7 +1,7 @@
 # Welcome to My GitHub Profile!
 
 ## About Me
-I'm a Finance student with a passion for Data science. Here I will be uploading my projects.
+I'm a Finance student with a passion for Data analysis. Here I will be uploading my projects.
 
 ## Projects
 - **Portfolio evaluation: (https://github.com/Geokaragiann/CV-Projects/Portfolio)**: This program recieves 2 or more tickers for stock market securities, and their respective 
