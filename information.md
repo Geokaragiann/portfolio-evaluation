@@ -5,9 +5,10 @@ I'm a Finance student with a passion for Data science. Here I will be uploading 
 
 ## Projects
 - **Portfolio evaluation: (https://github.com/Geokaragiann/CV-Projects/Portfolio)**: This program recieves 2 or more tickers for stock market securities, and their respective 
-weight in the portfolio, and calculates the annualized return and standard deviation of the portfolio. Also calculates the probability that the portfolio will have an annual return over x%
+weight in the portfolio, and calculates the annualized return and standard deviation of the portfolio. It also calculates the probability that the portfolio will have an annual return over x%
+The code is provided both in the more adaptable and easy to use jupyter notebook form, and in a standard .py file.
 
-## Get in Touch
+## Let's get in Touch
 - Email: Geokaragiann@outlook.com
 - LinkedIn: https://www.linkedin.com/in/giorgos-karagiannidis/
 
