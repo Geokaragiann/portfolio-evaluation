@@ -91,15 +91,3 @@ std= np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
 annual_std = std * np.sqrt(trading_days)
 
 print(f'Portfolio Annualized Standard Deviation: {annual_std:.4f}')
-
-# Number of bootstrap samples
-n_samples = 100000
-
-# Simulate portfolio returns by randomly sampling from the historical data
-bootstrap_returns = np.random.choice(returns.mean(axis=1) * trading_days, n_samples, replace=True)
-
-# Calculate the probability of returns over the target return
-prob_over_target = np.mean(bootstrap_returns > 0.06)
-
-print(f'Probability that the portfolio will have returns over 6% (bootstrap): {prob_over_target:.2%}')
-
