@@ -1,18 +1,20 @@
 # Welcome to My GitHub Profile!
 
 ## About Me
-I'm a Finance student with a passion for Data science and statistics. Here I will be uploading my projects.
+I'm a Finance undergraduate passionate about leveraging statistics and Python to unlock insights in financial data. Here I will be uploading my projects.
 
 ## Projects
-- **Portfolio evaluation: (https://github.com/Geokaragiann/CV-Projects/Portfolio)**: This program recieves 2, or more tickers for stock market securities, their respective weight in the portfolio, and the total portfolio value in dollars, and it calculates the annualized return and standard deviation of the portfolio. It also calculates the Value at risk and CVaR. At the end, it also creates a histogram with the relevant data.
-The code is provided both in the more adaptable and easy to use jupyter notebook form, and in a standard .py file.
+- **Portfolio evaluation: (https://github.com/Geokaragiann/CV-Projects/Portfolio)**:
+This Python script provides portfolio analysis for Stock market Securities. Users can input their desired securities and allocation weights to analyze their portfolio's risk-return characteristics. The tool calculates key metrics, including annualized returns (with compounding), volatility, Sharpe ratio, and maximum drawdown. It features risk analysis through Value at Risk (VaR) and Conditional VaR (CVaR) calculations, and evaluates portfolio diversification using the Effective N score. The analysis spans a 20-year historical period and includes visual representations of return distributions. It is indended to aid in understanding a portfolio's risk-adjusted performance and diversification effectiveness.
 
-    - **To be added:** 
-    
-        - The mean should be shown on the graph.
-        - The confidence interval should come from user input.
-        - The time period (365 days, 30 days, 5 days, whatever) should also come from user input.  
-        - Find optimal weights using monte carlo simulation? Maybe this should be a different project.
+    - Key features:
+        
+        - Historical return and risk metrics
+        - Portfolio diversification analysis
+        - Risk measures (VaR, CVaR)
+        - Visual distribution of returns
+        - Interactive weight allocation
+The code is provided both in the more adaptable and easy to use Jupyter notebook form, and in a standard .py file.
 
 ## Let's get in Touch
 - Email: Geokaragiann@outlook.com

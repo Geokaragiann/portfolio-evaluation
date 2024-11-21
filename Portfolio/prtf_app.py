@@ -105,6 +105,59 @@ annual_std = std * np.sqrt(365)
 
 print(f'Portfolio Annualized Standard Deviation: {annual_std:.4f}')
 
+# Calculate Sharpe Ratio (assuming risk-free rate of 0.0439 for example)
+risk_free_rate = 0.0439  # You could also fetch this dynamically
+sharpe_ratio = (annualized_return - risk_free_rate) / annual_std
+print(f'Portfolio Sharpe Ratio: {sharpe_ratio:.4f}')
+
+# ... after historical returns calculation ...
+
+def calculate_max_drawdown(returns):
+    cumulative = (1 + returns).cumprod()
+    rolling_max = cumulative.expanding().max()
+    drawdowns = cumulative / rolling_max - 1
+    return drawdowns.min()
+
+max_drawdown = calculate_max_drawdown(historical_returns)
+print(f'Maximum Drawdown: {max_drawdown:.4%}')
+
+# ... after covariance matrix calculation ...
+
+# Plot correlation matrix heatmap
+correlation_matrix = log_returns.corr()
+
+# ... after weights calculation ...
+
+def calculate_diversification_score(weights, correlation_matrix):
+    # Calculate concentration
+    concentration = np.sum(weights ** 2)
+    
+    # Calculate portfolio correlation
+    weighted_correlation = np.dot(np.dot(weights, correlation_matrix), weights)
+    
+    # Calculate diversification score (1 = poorly diversified, N = perfectly diversified)
+    div_score = 1 / (concentration * weighted_correlation)
+    
+    # Calculate maximum possible score (number of assets)
+    max_score = len(weights)
+    
+    # Calculate as a percentage of maximum possible diversification
+    div_percentage = (div_score / max_score) * 100
+    
+    return div_score, div_percentage
+
+div_score, div_percentage = calculate_diversification_score(weights, correlation_matrix)
+print(f"\nDiversification Analysis:")
+print(f"Diversification Score: {div_score:.2f}")
+print("Interpretation:")
+if div_score > len(weights):
+    print("✓ Excellent diversification! Your assets have beneficial negative correlations.")
+    print("  This means they tend to move in opposite directions, reducing portfolio risk.")
+elif div_score > len(weights) * 0.7:
+    print("✓ Good diversification. Your assets have low correlations with each other.")
+else:
+    print("! Consider adding more diversification. Your assets may be too correlated.")
+
 days = 365
 range_returns = historical_returns.rolling(window = days).sum()
 range_returns = range_returns.dropna()
