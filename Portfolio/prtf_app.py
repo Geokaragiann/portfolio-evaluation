@@ -123,40 +123,54 @@ print(f'Maximum Drawdown: {max_drawdown:.4%}')
 
 # ... after covariance matrix calculation ...
 
-# Plot correlation matrix heatmap
 correlation_matrix = log_returns.corr()
-
 # ... after weights calculation ...
-
 def calculate_diversification_score(weights, correlation_matrix):
-    # Calculate concentration
+    """
+    Calculate diversification score and percentage for a portfolio.
+
+    Args:
+        weights (array-like): Portfolio weights.
+        correlation_matrix (pd.DataFrame or np.ndarray): Asset correlation matrix.
+
+    Returns:
+        tuple: Diversification score and percentage of maximum possible diversification.
+    """
+    # Ensure weights are a numpy array
+    weights = np.array(weights)
+    
+    # Calculate concentration (sum of squared weights)
     concentration = np.sum(weights ** 2)
     
-    # Calculate portfolio correlation
+    # Calculate weighted average correlation
     weighted_correlation = np.dot(np.dot(weights, correlation_matrix), weights)
     
-    # Calculate diversification score (1 = poorly diversified, N = perfectly diversified)
+    # Diversification score
     div_score = 1 / (concentration * weighted_correlation)
     
-    # Calculate maximum possible score (number of assets)
+    # Maximum possible score (number of assets with equal weights and no correlations)
     max_score = len(weights)
     
-    # Calculate as a percentage of maximum possible diversification
+    # Calculate percentage of maximum diversification
     div_percentage = (div_score / max_score) * 100
     
     return div_score, div_percentage
 
+# Calculate diversification
 div_score, div_percentage = calculate_diversification_score(weights, correlation_matrix)
+
+# Print diversification analysis
 print(f"\nDiversification Analysis:")
 print(f"Diversification Score: {div_score:.2f}")
-print("Interpretation:")
+print(f"Diversification Percentage: {div_percentage:.2f}%")
+
+# Interpretation
 if div_score > len(weights):
-    print("✓ Excellent diversification! Your assets have beneficial negative correlations.")
-    print("  This means they tend to move in opposite directions, reducing portfolio risk.")
+    print("✓ Excellent diversification! Assets have favorable correlations.")
 elif div_score > len(weights) * 0.7:
-    print("✓ Good diversification. Your assets have low correlations with each other.")
+    print("✓ Good diversification. Consider additional decorrelation for improvement.")
 else:
-    print("! Consider adding more diversification. Your assets may be too correlated.")
+    print("! Low diversification. Your portfolio may be concentrated or highly correlated.")
 
 days = 365
 range_returns = historical_returns.rolling(window = days).sum()
