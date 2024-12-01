@@ -1,7 +1,7 @@
 # Welcome to My GitHub Profile!
 
 ## About Me
-I'm a Finance undergraduate passionate about leveraging statistics and Python to unlock insights in financial data. Here I will be uploading my projects.
+I'm a Finance undergraduate passionate about leveraging Statistics, Python, and AI to unlock insights in financial data. Here I will be uploading my projects.
 
 ## Projects
 - **Portfolio evaluation: (https://github.com/Geokaragiann/CV-Projects/tree/main/Portfolio_Evaluation)**:
