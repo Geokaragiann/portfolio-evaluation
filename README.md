@@ -1,16 +1,10 @@
-# Welcome to My GitHub Profile!
-
-## About Me
-I'm a Finance undergraduate passionate about leveraging Statistics, Python, and AI to unlock insights in financial data. Here I will be uploading my projects.
-
-## Projects
+## Project
 - **Portfolio evaluation: (https://github.com/Geokaragiann/CV-Projects/tree/main/Portfolio_Evaluation)**:
-This Python script provides portfolio analysis for Stock market Securities. Users can input their desired securities and allocation weights to analyze their portfolio's risk-return characteristics. The tool calculates key metrics, including annualized returns (with compounding), volatility, Sharpe ratio, and maximum drawdown. It features risk analysis through Value at Risk (VaR) and Conditional VaR (CVaR) calculations, and evaluates portfolio diversification using the Diversification Ratio. It includes visual representations of return distributions. It is indended to aid in understanding a portfolio's risk-adjusted performance and diversification effectiveness.
+This Python script provides portfolio analysis for Stock market Securities. Users can input their desired securities and allocation weights to analyze their portfolio's risk-return characteristics. The tool calculates key metrics, including the Compound Annual Growth Rate, Standard Deviation, Sharpe ratio, Maximum drawdown, Value at Risk (VaR), and Conditional VaR (CVaR). It includes visualizations to illustrate return distributions and the portfolio metrics. Available as a Jupyter notebook or Python script, it offers an interactive approach to portfolio analysis.
 
     - Key features:
         
         - Historical return and risk metrics
-        - Portfolio diversification analysis
         - Risk measures (VaR, CVaR)
         - Visual distribution of returns
         - Interactive weight allocation
