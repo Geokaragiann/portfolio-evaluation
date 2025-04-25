@@ -5,213 +5,80 @@ import matplotlib.pyplot as plt
 import datetime as dt
 
 # Constants
-ANALYSIS_PERIOD_YEARS = 20
-ROLLING_WINDOW_DAYS = 365
+ANALYSIS_PERIOD_YEARS = 10
 CONFIDENCE_LEVEL = 0.95
-RISK_FREE_RATE = 0.0439
-MIN_PORTFOLIO_ASSETS = 2
+TRADING_DAYS = 252
 
-def check_ticker_exists(ticker):
-    """Verify if a ticker exists in yfinance database."""
-    try:
-        data = yf.Ticker(ticker).info
-        return bool(data and 'symbol' in data)
-    except Exception as e:
-        print(f"Error checking ticker {ticker}: {e}")
-        return False
-
-def get_portfolio_weights(tickers):
-    """Get user input for portfolio weights ensuring they sum to 100%."""
-    while True:
-        weights_list = []
-        total_weight = 0
-        
-        for ticker in tickers:
-            while True:
-                try:
-                    weight = float(input(f'Enter the weight for {ticker} (in %): '))
-                    weight /= 100  # Convert percentage to decimal
-                    if 0 <= weight <= 1:
-                        weights_list.append(weight)
-                        total_weight += weight
-                        break
-                    else:
-                        print("Please enter a value between 0 and 100.")
-                except ValueError:
-                    print("Please enter a valid number.")
-        
-        if abs(total_weight - 1) < 0.01:
-            break
-        else:
-            print("The weights do not add up to 100%. Please enter them again.")
-    
-    return pd.Series(weights_list, index=tickers)
-
-def calculate_portfolio_metrics(daily_returns, portfolio_weights):
-    """Calculate key portfolio metrics."""
-    # Portfolio returns
-    portfolio_returns = (daily_returns * portfolio_weights).sum(axis=1)
-    
-    # Calculate rolling returns (365-day window)
-    range_returns = portfolio_returns.rolling(window=ROLLING_WINDOW_DAYS).sum()
-    range_returns = range_returns.dropna()
-    
-    # Calculate returns standard deviation
-    returns_std = range_returns.std()
-    
-    # Calculate average daily return and annualize it
-    avg_daily_return = portfolio_returns.mean()
-    annualized_return = np.exp(avg_daily_return * 365) - 1
-    
-    # Sharpe ratio
-    sharpe_ratio = (annualized_return - RISK_FREE_RATE) / returns_std
-    
-    return {
-        'returns': portfolio_returns,
-        'range_returns': range_returns,
-        'returns_std': returns_std,
-        'annualized_return': annualized_return,
-        'sharpe_ratio': sharpe_ratio
-    }
-def calculate_max_drawdown(returns):
-    """Calculate maximum drawdown of portfolio."""
-    cumulative = (1 + returns).cumprod()
-    rolling_max = cumulative.expanding().max()
-    drawdowns = cumulative / rolling_max - 1
-    return drawdowns.min()
-
-def calculate_diversification_score(portfolio_weights, correlation_matrix):
-    """
-    Calculate portfolio diversification ratio.
-    DR = weighted sum of individual volatilities / portfolio volatility
-    A higher ratio indicates better diversification.
-    """
-    # Calculate individual volatilities
-    volatilities = np.sqrt(np.diag(correlation_matrix))
-    
-    # Weighted sum of individual volatilities
-    weighted_sum_vol = np.sum(portfolio_weights * volatilities)
-    
-    # Calculate portfolio volatility
-    portfolio_vol = np.sqrt(np.dot(portfolio_weights, np.dot(correlation_matrix, portfolio_weights)))
-    
-    # Calculate diversification ratio
-    div_ratio = weighted_sum_vol / portfolio_vol if portfolio_vol != 0 else 0
-    
-    # Calculate as percentage of maximum possible diversification
-    max_ratio = np.sqrt(len(portfolio_weights))  # Theoretical maximum with perfect negative correlation
-    div_percentage = (div_ratio / max_ratio) * 100
-    
-    return div_ratio, div_percentage
-
-def calculate_risk_metrics(portfolio_returns, portfolio_value):
-    """Calculate VaR and CVaR."""
-    rolling_returns = portfolio_returns.rolling(window=ROLLING_WINDOW_DAYS).sum()
-    rolling_returns = rolling_returns.dropna()
-    
-    value_at_risk = -np.percentile(rolling_returns, 100 - (CONFIDENCE_LEVEL * 100))
-    conditional_var = -rolling_returns[rolling_returns <= -value_at_risk].mean()
-    
-    return {
-        'rolling_returns': rolling_returns,
-        'value_at_risk': value_at_risk,
-        'conditional_var': conditional_var
-    }
-
-def plot_returns_distribution(rolling_returns, portfolio_value, value_at_risk, annualized_return):
-    """Plot the distribution of portfolio returns."""
-    returns_dollar = rolling_returns * portfolio_value
-    
-    plt.figure(figsize=(12, 6))
-    plt.hist(returns_dollar.dropna(), bins=50, density=True)
-    plt.xlabel(f'{ROLLING_WINDOW_DAYS}-Day Portfolio Return (Dollar Value)')
-    plt.ylabel('Frequency')
-    plt.title(f'Distribution of Portfolio {ROLLING_WINDOW_DAYS}-Day Returns (Dollar Value)')
-    
-    # Add VaR line
-    plt.axvline(-value_at_risk * portfolio_value, 
-                color='r', 
-                linestyle='dashed', 
-                linewidth=2, 
-                label=f'VaR at {CONFIDENCE_LEVEL:.0%} confidence level')
-    
-    # Add average return line
-    plt.axvline(annualized_return * portfolio_value, 
-                color='black', 
-                linestyle='dashed', 
-                linewidth=2, 
-                label='365-day rolling average')
-    
-    plt.legend()
-    plt.show()
-
-def print_portfolio_analysis(metrics, risk_metrics, div_score, div_percentage, max_drawdown):
-    """Print all portfolio analysis results."""
-    print("\nPortfolio Analysis Results:")
-    print("-" * 50)
-    print(f"Annualized Return: {metrics['annualized_return']:.2%}")
-    print(f"Annual Standard Deviation: {metrics['returns_std']:.2%}")s
-    print(f"Sharpe Ratio: {metrics['sharpe_ratio']:.4f}")  # Added this line
-    print(f"Maximum Drawdown: {max_drawdown:.2%}")
-    
-    print("\nDiversification Analysis:")
-    print(f"Diversification Score: {div_score:.2f}")
-    print(f"Diversification Percentage: {div_percentage:.2f}%")
-    
-    if div_score > 1.5:
-        print("✓ Excellent diversification! Assets have favorable correlations.")
-    elif div_score > 1.2:
-        print("✓ Good diversification. Consider additional decorrelation for improvement.")
-    else:
-        print("! Low diversification. Your portfolio may be concentrated or highly correlated.")
-    
-    print("\nRisk Metrics:")
-    print(f"VaR: There is a {(1-CONFIDENCE_LEVEL)*100:.1f}% chance that the portfolio loss")
-    print(f"     will exceed {risk_metrics['value_at_risk']*100:.2f}% in {ROLLING_WINDOW_DAYS} days.")
-    print(f"CVaR: If the loss exceeds the VaR, the average loss is {risk_metrics['conditional_var']*100:.2f}%")
-    print(f"      in {ROLLING_WINDOW_DAYS} days.")
+# Risk Free Rate
+tbill = yf.download("^IRX", period="1wk", auto_adjust=False)
+risk_free_rate = (tbill['Adj Close'].tail(5).mean() / 100).iloc[0]
 
 
-
-"""Main execution flow."""
-# Get portfolio tickers
-portfolio_tickers = []
-ticker_count = 1
-
-while True:
-    ticker = input(f'Enter ETF/Index number {ticker_count} or 0 to finish: ').upper()
-    if ticker == '0':
-        if len(portfolio_tickers) < MIN_PORTFOLIO_ASSETS:
-            print(f"Your portfolio needs at least {MIN_PORTFOLIO_ASSETS} securities.")
-        else:
-            break
-    elif check_ticker_exists(ticker):
-        print("Ticker found.")
-        portfolio_tickers.append(ticker)
-        ticker_count += 1
-    else:
-        print("Invalid ticker. Please try again.")
-
-# Get portfolio value and weights
-portfolio_value = float(input("Input portfolio value in dollars: "))
-portfolio_weights = get_portfolio_weights(portfolio_tickers)
-
-# Download and process data
 end_date = dt.datetime.now()
 start_date = end_date - dt.timedelta(days=365*ANALYSIS_PERIOD_YEARS)
-daily_prices = yf.download(portfolio_tickers, start=start_date, end=end_date)['Adj Close']
-daily_returns = np.log(daily_prices / daily_prices.shift(1)).dropna()
+etfs = ['AMZN', 'IBM', 'V','WMT','TLT']
+portfolio_weights = np.array([0.2,0.2,0.2,0.2,0.2])
+daily_prices = yf.download(etfs, start=start_date, end=end_date, auto_adjust=False)['Adj Close'].dropna()  # Days without data for all stocks will be removed.
 
-# Calculate all metrics
-metrics = calculate_portfolio_metrics(daily_returns, portfolio_weights)
-risk_metrics = calculate_risk_metrics(metrics['returns'], portfolio_value)
-max_drawdown = calculate_max_drawdown(metrics['returns'])
-correlation_matrix = daily_returns.corr()
-div_score, div_percentage = calculate_diversification_score(portfolio_weights, correlation_matrix)
 
-# Print results and plot
-print_portfolio_analysis(metrics, risk_metrics, div_score, div_percentage, max_drawdown)
-plot_returns_distribution(risk_metrics['rolling_returns'], 
-                        portfolio_value,
-                        risk_metrics['value_at_risk'],
-                        metrics['annualized_return'])
+# Calculation of daily returns --- Foundation for subsequent calculations
+daily_log_returns = np.log(daily_prices/daily_prices.shift(1)).dropna()
+daily_arithmetic_returns = (daily_prices/daily_prices.shift(1))-1
+
+# Portfolio daily returns
+portf_daily_arithmetic_returns = daily_arithmetic_returns @ portfolio_weights  # @ is for matrix multiplication!
+portf_daily_log_returns = daily_log_returns @ portfolio_weights
+
+# Annualized geometric return
+total_return = (1 + portf_daily_arithmetic_returns).prod() - 1
+n_years = (portf_daily_arithmetic_returns.index[-1] - portf_daily_arithmetic_returns.index[0]).days / 365
+portf_annualized_geometric_return = (1 + total_return) ** (1 / n_years) - 1
+
+# Annualized arithmetic return
+portf_annualized_arithmetic_return = portf_daily_arithmetic_returns.mean() * TRADING_DAYS
+
+# Annualized standard deviation
+annualized_std = portf_daily_log_returns.std() * np.sqrt(TRADING_DAYS)
+
+# Sharpe ratio
+sharpe_ratio = (portf_annualized_geometric_return - risk_free_rate) / annualized_std
+
+# Max drawdown
+cum_portf_value = np.exp(portf_daily_log_returns.cumsum())
+peak = cum_portf_value.cummax()
+drawdown = (cum_portf_value / peak) - 1
+max_drawdown = drawdown.min()
+
+annual_returns = portf_daily_log_returns.rolling(window=TRADING_DAYS).sum().dropna()
+annual_var = -np.percentile(annual_returns, 100 * (1 - CONFIDENCE_LEVEL))
+annual_cvar = -annual_returns[annual_returns <= -annual_var].mean()
+
+
+print("\nPortfolio Analysis Results:")
+print("-" * 50)
+print(f"Annualized Geometric Return: {portf_annualized_geometric_return:.2%}")
+print(f"Annualized Arithmetic Return: {portf_annualized_arithmetic_return:.2%}")
+print(f"Annualized Standard Deviation: {annualized_std:.4f}")
+print(f"Sharpe Ratio: {sharpe_ratio:.3f}")
+print(f"Maximum Drawdown: {max_drawdown:.2%}")
+
+print(f"1-Year VaR: There is a {(1-CONFIDENCE_LEVEL)*100:.1f}% chance that the portfolio loss")
+print(f"           will exceed {annual_var*100:.2f}% in 1 year.")
+print(f"1-Year CVaR: If the loss exceeds the VaR, the average loss is {annual_cvar*100:.2f}%")
+print(f"            in 1 year.")
+
+
+plt.figure(figsize=(12, 6))
+plt.hist(annual_returns, bins=50, density=True, alpha=0.85)
+plt.axvline(portf_annualized_geometric_return, color='black', linestyle='dashed', 
+            linewidth=2, label='Annualized Geometric Return')
+plt.axvline(-annual_var, color='red', linestyle='dashed', 
+            linewidth=2, label=f'VaR ({CONFIDENCE_LEVEL:.0%})')
+plt.xlabel('Annual Returns')
+plt.ylabel('Density')
+plt.title('Distribution of Portfolio Annual Returns')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+
