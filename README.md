@@ -11,7 +11,6 @@ This Python script provides portfolio analysis for Stock market Securities. User
         - Visual distribution of returns
         - Interactive weight allocation
 
-The code is provided both in the more adaptable and easy to use Jupyter notebook form, and in a standard .py file.
 
 ## Let's get in Touch
 - Email: Geokaragiann@outlook.com
