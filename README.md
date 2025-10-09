@@ -1,7 +1,7 @@
 ## Project
 
 
-- **Portfolio evaluation:
+- **Portfolio evaluation**:
 This Python script provides portfolio analysis for Stock market Securities. Users can input their desired securities and allocation weights to analyze their portfolio's risk-return characteristics. The tool calculates key metrics, including the Compound Annual Growth Rate, Standard Deviation, Sharpe ratio, Maximum drawdown, Value at Risk (VaR), and Conditional VaR (CVaR). It includes visualizations to illustrate return distributions and the portfolio metrics. Available as a Jupyter notebook or Python script, it offers an interactive approach to portfolio analysis.
 
     - Key features:
