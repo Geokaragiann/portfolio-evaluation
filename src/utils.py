@@ -3,10 +3,10 @@ import numpy as np
 import pandas as pd
 
 
-def geometric_portfolio_returns(daily_returns: pd.DataFrame, weights: np.ndarray) -> Tuple[float, pd.Series]:
+def portfolio_returns(daily_returns: pd.DataFrame, weights: np.ndarray) -> Tuple[float, pd.Series]:
     """
     Given daily returns and weights for each security, this function calculates and 
-    returns the average annual return & annual returns for the portfolio.
+    returns the average annual return, annual returns, and for the portfolio.
     """
     
 
@@ -19,6 +19,8 @@ def geometric_portfolio_returns(daily_returns: pd.DataFrame, weights: np.ndarray
     
     return average_annual_return, annual_returns
 
+def cagr(daily_prices: pd.DataFrame, weights: np.ndarray) -> float:
+    return (((daily_prices.iloc[-1]/daily_prices.iloc[0])-1) @ weights)**(252/2583)
 
 def standard_deviation(daily_returns: pd.DataFrame, weights: np.ndarray) -> float:
     """
@@ -28,5 +30,5 @@ def standard_deviation(daily_returns: pd.DataFrame, weights: np.ndarray) -> floa
 
     covariance_matrix: pd.DataFrame = daily_returns.cov()
     daily_std = np.sqrt(weights.T @ covariance_matrix @ weights)
-    annualized_std = daily_std * np.sqrt(252) # total rows after cleaning = 5029. 5029/20 years = 251.45. However, I use 252 to avoid underestimating
+    annualized_std = daily_std * np.sqrt(252)
     return annualized_std
