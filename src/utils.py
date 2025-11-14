@@ -22,7 +22,7 @@ def portfolio_returns(daily_returns: pd.DataFrame, weights: np.ndarray) -> Tuple
 def cagr(daily_prices: pd.DataFrame, weights: np.ndarray) -> float:
     return (((daily_prices.iloc[-1]/daily_prices.iloc[0])-1) @ weights)**(252/2583)
 
-def standard_deviation(daily_returns: pd.DataFrame, weights: np.ndarray) -> float:
+def standard_deviation(daily_returns: pd.DataFrame, weights: np.ndarray) -> Tuple[float, float]:
     """
     Given daily stock data and weights for each security, this function calculates and 
     returns the standard deviation of the portfolio.
@@ -31,4 +31,4 @@ def standard_deviation(daily_returns: pd.DataFrame, weights: np.ndarray) -> floa
     covariance_matrix: pd.DataFrame = daily_returns.cov()
     daily_std = np.sqrt(weights.T @ covariance_matrix @ weights)
     annualized_std = daily_std * np.sqrt(252)
-    return annualized_std
+    return annualized_std, daily_std
